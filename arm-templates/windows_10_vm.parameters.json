@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus3"
+        },
+        "nsgName": {
+            "value": "networkSecurityGroup1"
+        },
+        "nsgRule01": {
+            "value": "nsgRule1"
+        },
+        "vnetName": {
+            "value": "virtualNetwork1"
+        }
+    }
+}
