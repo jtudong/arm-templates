@@ -22,9 +22,16 @@
         },
         "vnetName": {
             "type": "string",
-            "defaultValue": "virtualNetwork1",
+            "defaultValue": "virtualNetwork1-dev-vnet",
             "metadata": {
                 "description": "The name of the Vnet"
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "windowsVM1",
+            "metadata": {
+                "description": "The name of the virtual machine"
             }
         }
     },
@@ -82,14 +89,14 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "10.0.0.0/16"
+                        "10.16.0.0/16"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "Subnet-1",
                         "properties": {
-                            "addressPrefix": "10.0.0.0/24",
+                            "addressPrefix": "10.16.10.0/24",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
                             }
@@ -98,7 +105,7 @@
                     {
                         "name": "Subnet-2",
                         "properties": {
-                            "addressPrefix": "10.0.1.0/24"
+                            "addressPrefix": "10.16.11.0/24"
                         }
                     }
                 ]
@@ -163,7 +170,7 @@
             }
         },
         {
-            "name": "windowsVM1",
+            "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "location": "[parameters('location')]",

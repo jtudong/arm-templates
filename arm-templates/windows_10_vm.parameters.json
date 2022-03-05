@@ -12,7 +12,10 @@
             "value": "nsgRule1"
         },
         "vnetName": {
-            "value": "virtualNetwork1"
+            "value": "sfc01-wu3-dev-vnet"
+        },
+        "vmName": {
+            "value": "aw3wfirewalltest01"
         }
     }
 }
