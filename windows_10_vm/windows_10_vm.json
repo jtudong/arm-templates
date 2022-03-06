@@ -42,7 +42,7 @@
             "Environment": "sandbox",
             "Application": "network"
         },
-        "namePublicIPAddress": "[concat(parameters('vnetName'),'-pip')]",
+        "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
         "nsgName": "[concat(parameters('subnetName'),'-nsg')]"
     },
     "resources": [
@@ -171,7 +171,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', 'test-01-nic')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', 'sfcstorage202202161300')]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "tags":"[variables('tags')]",
             "properties": {
