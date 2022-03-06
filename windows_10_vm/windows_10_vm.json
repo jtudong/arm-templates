@@ -26,6 +26,12 @@
             "metadata": {
                 "description": "The name of the subnet"
             }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the storage account"
+            }
         }
     },
     "functions": [],
@@ -77,6 +83,7 @@
             "name": "[parameters('vnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
@@ -102,7 +109,7 @@
         {
             //  Create a storage account
             //
-            "name": "sfcstorage202202161300",
+            "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
             "tags": "[variables('tags')]",
