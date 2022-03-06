@@ -43,7 +43,8 @@
             "Application": "network"
         },
         "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
-        "nsgName": "[concat(parameters('subnetName'),'-nsg')]"
+        "nsgName": "[concat(parameters('subnetName'),'-nsg')]",
+        "networkInterfaceName": "[concat(parameters('subnetName'),'-01','-nic')]"
     },
     "resources": [
         {
@@ -123,7 +124,7 @@
         {
             //  Create a Network Interface
             //
-            "name": "test-01-nic",
+            "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -170,7 +171,7 @@
             "apiVersion": "2021-03-01",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', 'test-01-nic')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "tags":"[variables('tags')]",
