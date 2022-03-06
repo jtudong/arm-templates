@@ -45,7 +45,8 @@
         },
         "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
         "nsgName": "[concat(parameters('subnetName'),'-nsg')]",
-        "networkInterfaceName": "[concat(parameters('subnetName'),'-01','-nic')]"
+        "networkInterfaceName": "[concat(parameters('subnetName'),'-01','-nic')]",
+        "osDiskName": "[concat(parameters('vmName'),'-os-disk')]"
     },
     "resources": [
         {
@@ -200,7 +201,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "windowsVM1OSDisk",
+                        "name": "[variables('osDiskName')]",
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     }
