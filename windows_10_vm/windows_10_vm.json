@@ -16,6 +16,7 @@
         "vmName": {
             "type": "string",
             "defaultValue": "windowsVM1",
+            "maxLength": 15,
             "metadata": {
                 "description": "The name of the virtual machine"
             }

@@ -9,7 +9,7 @@
             "value": "sfc01-wu3-dev-vnet"
         },
         "vmName": {
-            "value": "aw3wfirewalltest01"
+            "value": "aw3wfwtest01"
         },
         "subnetName": {
             "value": "dev-firewalltest"
