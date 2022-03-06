@@ -16,6 +16,9 @@
         },
         "vmName": {
             "value": "aw3wfirewalltest01"
+        },
+        "subnetName": {
+            "value": "dev-firewalltest"
         }
     }
 }

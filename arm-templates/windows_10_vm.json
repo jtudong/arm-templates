@@ -33,6 +33,13 @@
             "metadata": {
                 "description": "The name of the virtual machine"
             }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "description": "The name of the subnet"
+            }
         }
     },
     "functions": [],
@@ -94,18 +101,12 @@
                 },
                 "subnets": [
                     {
-                        "name": "Subnet-1",
+                        "name": "[parameters('subnetName')]",
                         "properties": {
                             "addressPrefix": "10.16.10.0/24",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
                             }
-                        }
-                    },
-                    {
-                        "name": "Subnet-2",
-                        "properties": {
-                            "addressPrefix": "10.16.11.0/24"
                         }
                     }
                 ]
