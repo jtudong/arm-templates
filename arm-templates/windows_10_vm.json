@@ -6,20 +6,6 @@
             "type": "string",
             "defaultValue": "westus3"
         },
-        "nsgName": {
-            "type": "string",
-            "defaultValue": "networkSecurityGroup1",
-            "metadata": {
-                "description": "The name of the NSG"
-            }
-        },
-        "nsgRule01": {
-            "type": "string",
-            "defaultValue": "nsgRule1",
-            "metadata": {
-                "description": "NSG inbound rule 1"
-            }
-        },
         "vnetName": {
             "type": "string",
             "defaultValue": "virtualNetwork1-dev-vnet",
@@ -50,13 +36,14 @@
             "Environment": "sandbox",
             "Application": "network"
         },
-        "namePublicIPAddress": "[concat(parameters('vnetName'),'-pip')]"
+        "namePublicIPAddress": "[concat(parameters('vnetName'),'-pip')]",
+        "nsgName": "[concat(parameters('subnetName'),'-nsg')]"
     },
     "resources": [
         {
             //  Create the NSG
             //
-            "name": "[parameters('nsgName')]",
+            "name": "[variables('nsgName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -64,7 +51,7 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "[parameters('nsgRule01')]",
+                        "name": "AllowRDPInbound",
                         "properties": {
                             "description": "description",
                             "protocol": "Tcp",
@@ -90,7 +77,7 @@
             "name": "[parameters('vnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
-            "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"],
+            "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -105,7 +92,7 @@
                         "properties": {
                             "addressPrefix": "10.16.10.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
                             }
                         }
                     }

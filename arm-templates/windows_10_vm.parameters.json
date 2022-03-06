@@ -5,12 +5,6 @@
         "location": {
             "value": "westus3"
         },
-        "nsgName": {
-            "value": "networkSecurityGroup1"
-        },
-        "nsgRule01": {
-            "value": "nsgRule1"
-        },
         "vnetName": {
             "value": "sfc01-wu3-dev-vnet"
         },
