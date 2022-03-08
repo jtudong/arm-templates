@@ -45,7 +45,7 @@
         },
         "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
         "nsgName": "[concat(parameters('subnetName'),'-nsg')]",
-        "networkInterfaceName": "[concat(parameters('subnetName'),'-01','-nic')]",
+        "networkInterfaceName": "[concat(parameters('vmName'),'-01','-nic')]",
         "osDiskName": "[concat(parameters('vmName'),'-os-disk')]"
     },
     "resources": [
