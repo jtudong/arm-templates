@@ -1,7 +1,11 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {        
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "westus3"
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "sfc01-wu3-sandbox-vnet",
@@ -34,7 +38,6 @@
     },
     "functions": [],
     "variables": {
-        "resourceLocation": "[resourceGroup().location]",
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-nic')]",
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-nsg')]"
     },
@@ -45,7 +48,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "name": "[parameters('virtualNetworkName')]",
-            "location": "[variables('resourceLocation')]",
+            "location": "[parameters('location')]",
             "tags": {},
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
@@ -76,7 +79,7 @@
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
-            "location": "[variables('resourceLocation')]",
+            "location": "[parameters('location')]",
             "tags": {},
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
@@ -102,7 +105,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "name": "[variables('networkSecurityGroupName')]",
-            "location": "[variables('resourceLocation')]",
+            "location": "[parameters('location')]",
             "tags": {},
             "properties": {
                 "securityRules": [
@@ -123,7 +126,6 @@
                             "sourceAddressPrefixes": [],
                             "destinationAddressPrefixes": []
                         }
-                        
                     }
                 ]
             }
@@ -136,7 +138,7 @@
             "tags": {
                 "displayName": "templatestorage2201"
             },
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "kind": "StorageV2",
             "sku": {
                 "name": "Standard_LRS",
@@ -150,7 +152,7 @@
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
-            "location": "[variables('resourceLocation')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
                 "[concat('Microsoft.Storage/storageAccounts/','templatestorage2201')]"
@@ -198,7 +200,7 @@
                     }
                 }
             }
-        }          
+        }
     ],
     "outputs": {}
 }
