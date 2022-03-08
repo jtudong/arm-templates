@@ -56,14 +56,14 @@
             "properties": {
                 "addressSpace":{
                     "addressPrefixes": [
-                        "10.107.0.0/16"
+                        "10.116.0.0/16"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "subnet01",
                         "properties": {
-                            "addressPrefix": "10.107.1.0/24",
+                            "addressPrefix": "10.116.9.0/24",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
                             }
