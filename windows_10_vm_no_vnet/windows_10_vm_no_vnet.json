@@ -51,6 +51,7 @@
             "Application": "network",
             "PowerManagement": "shutdownendofday"
         },
+        "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
         "nsgName": "[concat(parameters('subnetName'),'-nsg')]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-01','-nic')]",
         "osDiskName": "[concat(parameters('vmName'),'-os-disk')]"
@@ -176,25 +177,6 @@
                             "direction": "Inbound",
                             "sourcePortRanges": [],
                             "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    },
-                    {
-                        "name": "AllowInternalSSHInbound",
-                        "properties": {
-                            "description": "AllowInternalSSHInbound",
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1500,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [
-                                "22"
-                            ],
                             "sourceAddressPrefixes": [],
                             "destinationAddressPrefixes": []
                         }
@@ -383,12 +365,13 @@
                 ]
             }
         },
-        /* {
+        {
             //  Create a PIP
             //
             "name": "[variables('namePublicIPAddress')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
+            "condition": false,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -397,7 +380,7 @@
             "sku": {
                 "name": "Basic"
             }
-        }, */
+        },
         {
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
