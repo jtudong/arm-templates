@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus3"
+        },
+        "vnetName": {
+            "value": "sfc01-wu3-dev-vnet"
+        },
+        "vmName": {
+            "value": "aw3wfwtest01"
+        },
+        "subnetName": {
+            "value": "dev-firewalltest"
+        },
+        "storageAccountName": {
+            "value": "sfcfirewalltest0305sa"
+        }
+    }
+}
