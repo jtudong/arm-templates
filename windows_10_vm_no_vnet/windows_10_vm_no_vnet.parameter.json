@@ -15,7 +15,7 @@
             "value": "dev-firewalltest"
         },
         "storageAccountName": {
-            "value": "sfcfirewalltest0305sa"
+            "value": "sfcfirewalltestsa"
         }
     }
 }

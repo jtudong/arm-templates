@@ -40,10 +40,10 @@
         "tags": {
             "Department": "it",
             "Team": "networking",
-            "Environment": "sandbox",
-            "Application": "network"
+            "Environment": "dev",
+            "Application": "network",
+            "PowerManagement": "shutdownendofday"
         },
-        "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
         "nsgName": "[concat(parameters('subnetName'),'-nsg')]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-01','-nic')]",
         "osDiskName": "[concat(parameters('vmName'),'-os-disk')]"
@@ -80,13 +80,13 @@
                 ]
             }
         },
-        {
+        /* {
             //  Create the VNet
             //
             "name": "[parameters('vnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
-            "condition": true,
+            "condition": false,
             "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
@@ -108,7 +108,7 @@
                     }
                 ]
             }
-        },
+        }, */
         {
             //  Create a storage account
             //
@@ -131,10 +131,7 @@
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('namePublicIPAddress'))]"
-            ],
+            "dependsOn": [],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -143,16 +140,13 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('namePublicIPAddress'))]"
                             }
                         }
                     }
                 ]
             }
         },
-        {
+        /* {
             //  Create a PIP
             //
             "name": "[variables('namePublicIPAddress')]",
@@ -166,7 +160,7 @@
             "sku": {
                 "name": "Basic"
             }
-        },
+        }, */
         {
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
