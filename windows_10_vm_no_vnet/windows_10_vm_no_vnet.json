@@ -6,13 +6,6 @@
             "type": "string",
             "defaultValue": "westus3"
         },
-        "vnetName": {
-            "type": "string",
-            "defaultValue": "virtualNetwork1-dev-vnet",
-            "metadata": {
-                "description": "The name of the Vnet"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "windowsVM1",
@@ -32,13 +25,6 @@
             "type": "string",
             "metadata": {
                 "description": "The name of the storage account"
-            }
-        },
-        "vnetResourceGroupName": {
-            "type": "string",
-            "defaultValue":"sfc-network-dev-rg",
-            "metadata": {
-                "description": "description"
             }
         }
     },

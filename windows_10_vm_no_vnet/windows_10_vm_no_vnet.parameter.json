@@ -5,9 +5,6 @@
         "location": {
             "value": "westus3"
         },
-        "vnetName": {
-            "value": "sfc01-wu3-dev-vnet"
-        },
         "vmName": {
             "value": "aw3wfwtest01"
         },
