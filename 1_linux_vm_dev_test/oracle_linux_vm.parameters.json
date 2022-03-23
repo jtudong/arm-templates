@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus3"
+        },
+        "virtualNetworkName": {
+            "value": "sfc01-wu3-sandbox-vnet"
+        },
+        "virtualMachineName": {
+            "value": "aw3lfwtest01"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_B2s"
+        },
+        "osDiskType": {
+            "value": "Standard_LRS"
+        }
+    }
+}
