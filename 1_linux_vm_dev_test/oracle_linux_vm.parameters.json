@@ -5,9 +5,6 @@
         "location": {
             "value": "westus3"
         },
-        "virtualNetworkName": {
-            "value": "sfc01-wu3-sandbox-vnet"
-        },
         "virtualMachineName": {
             "value": "aw3lfwtest01"
         },
@@ -16,6 +13,12 @@
         },
         "osDiskType": {
             "value": "Standard_LRS"
+        },
+        "subnetName": {
+            "value": "dev-firewalltest"
+        },
+        "storageAccountName": {
+            "value": "sfcfirewalltestsa"
         }
     }
 }
