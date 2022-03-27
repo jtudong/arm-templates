@@ -40,6 +40,13 @@
             "metadata": {
                 "description": "The name of the storage account"
             }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "description": "The name of the subnet"
+            }
         }
     },
     "functions": [],
@@ -50,6 +57,7 @@
             "Environment": "sandbox",
             "Application": "network"
         },
+        "namePublicIPAddress": "[concat(parameters('subnetName'),'-pip')]",
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-nic')]",
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-nsg')]"
     },
@@ -94,7 +102,8 @@
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('namePublicIPAddress'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -104,6 +113,9 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'subnet01')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('namePublicIPAddress'))]"
                             }
                         }
                     }
@@ -140,6 +152,21 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            //  Create a PIP
+            //
+            "name": "[variables('namePublicIPAddress')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
             }
         },
             //  storage account

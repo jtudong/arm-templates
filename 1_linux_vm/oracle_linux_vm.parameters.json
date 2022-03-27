@@ -19,6 +19,9 @@
         },
         "storageAccountName": {
             "value": "templatestorage220326"
+        },
+        "subnetName": {
+            "value": "dev-firewalltest"
         }
     }
 }
