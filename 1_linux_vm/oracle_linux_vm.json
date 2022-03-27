@@ -44,6 +44,12 @@
     },
     "functions": [],
     "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "sandbox",
+            "Application": "network"
+        },
         "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-nic')]",
         "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-nsg')]"
     },
@@ -55,7 +61,7 @@
             "apiVersion": "2020-11-01",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('location')]",
-            "tags": {},
+            "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
             ],
@@ -86,7 +92,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
-            "tags": {},
+            "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
             ],
@@ -112,7 +118,7 @@
             "apiVersion": "2020-11-01",
             "name": "[variables('networkSecurityGroupName')]",
             "location": "[parameters('location')]",
-            "tags": {},
+            "tags": "[variables('tags')]",
             "properties": {
                 "securityRules": [
                     {
@@ -141,7 +147,7 @@
             "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
-            "tags": {},
+            "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
             "sku": {
@@ -161,7 +167,7 @@
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
                 "[concat('Microsoft.Storage/storageAccounts/',parameters('storageAccountName'))]"
             ],
-            "tags": {},
+            "tags": "[variables('tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('virtualMachineSize')]"
