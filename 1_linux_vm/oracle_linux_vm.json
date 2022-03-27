@@ -141,9 +141,7 @@
             "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
-            "tags": {
-                "displayName": "templatestorage2201"
-            },
+            "tags": {},
             "location": "[parameters('location')]",
             "kind": "StorageV2",
             "sku": {
@@ -161,7 +159,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/','templatestorage2201')]"
+                "[concat('Microsoft.Storage/storageAccounts/',parameters('storageAccountName'))]"
             ],
             "tags": {},
             "properties": {
