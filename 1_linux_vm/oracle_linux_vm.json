@@ -34,6 +34,12 @@
         "osDiskType": {
             "type": "string",
             "defaultValue": "Standard_LRS"
+        },
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the storage account"
+            }
         }
     },
     "functions": [],
@@ -56,14 +62,14 @@
             "properties": {
                 "addressSpace":{
                     "addressPrefixes": [
-                        "10.116.0.0/16"
+                        "10.16.0.0/16"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "subnet01",
                         "properties": {
-                            "addressPrefix": "10.116.9.0/24",
+                            "addressPrefix": "10.16.9.0/24",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
                             }
@@ -132,7 +138,7 @@
         },
             //  storage account
         {
-            "name": "templatestorage2201",
+            "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
             "tags": {
@@ -196,7 +202,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "https://templatestorage2201.blob.core.windows.net/"
+                        "storageUri": "[concat('https://',parameters('storageAccountName'),'.blob.core.windows.net/')]"
                     }
                 }
             }

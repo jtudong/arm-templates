@@ -16,6 +16,9 @@
         },
         "osDiskType": {
             "value": "Standard_LRS"
+        },
+        "storageAccountName": {
+            "value": "templatestorage220326"
         }
     }
 }
