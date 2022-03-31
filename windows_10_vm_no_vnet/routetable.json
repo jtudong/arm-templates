@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "routeTables_name": {
+            "defaultValue": "dev-firewalltest-routetable",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('routeTables_name')]",
+            "location": "westus3",
+            "tags": {
+                "Department": "it",
+                "Environment": "dev",
+                "Team": "networking",
+                "Application": "firewall"
+            },
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "Local-subnet",
+                        "properties": {
+                            "addressPrefix": "10.16.9.0/24",
+                            "nextHopType": "VnetLocal",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "internet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "prod-vnet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.17.0.0/16",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "dev-vnet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.16.0.0/16",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "vpngw-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/8",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "vpngw-forced-firewall2",
+                        "properties": {
+                            "addressPrefix": "172.16.0.0/12",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
