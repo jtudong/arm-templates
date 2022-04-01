@@ -6,11 +6,11 @@
             "type": "string",
             "defaultValue": "westus3"
         },
-        "virtualNetworkName": {
+        "subnetName": {
             "type": "string",
-            "defaultValue": "sfc01-wu3-sandbox-vnet",
+            "defaultValue": "Subnet-1",
             "metadata": {
-                "description": "The name of the virtual network"
+                "description": "The name of the subnet"
             }
         },
         "virtualMachineName": {
@@ -34,44 +34,28 @@
         "osDiskType": {
             "type": "string",
             "defaultValue": "Standard_LRS"
+        },
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the storage account"
+            }
         }
     },
     "functions": [],
     "variables": {
-        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-nic')]",
-        "networkSecurityGroupName": "[concat(parameters('virtualMachineName'),'-nsg')]"
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "dev",
+            "Application": "network",
+            "PowerManagement": "shutdownendofday"
+        },
+        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-01','-nic')]",
+        "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
+        "osDiskName": "[concat(parameters('virtualMachineName'),'-os-disk')]"
     },
     "resources": [
-        {           //    virtual network and subnet(s)
-                    //
-            "condition": true,
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2020-11-01",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('location')]",
-            "tags": {},
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
-            ],
-            "properties": {
-                "addressSpace":{
-                    "addressPrefixes": [
-                        "10.116.0.0/16"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "subnet01",
-                        "properties": {
-                            "addressPrefix": "10.116.9.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
         {
             //    network interface
             //
@@ -80,10 +64,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
-            "tags": {},
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
-            ],
+            "tags": "[variables('tags')]",
             "properties": {
                 "ipConfigurations": [
                     {
@@ -91,7 +72,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'subnet01')]"
+                                "id": "/subscriptions/67b03f65-308b-456f-b4a9-572c14a374cc/resourceGroups/sfc-network-dev-rg/providers/Microsoft.Network/virtualNetworks/sfc01-wu3-dev-vnet/subnets/dev-firewalltest"
                             }
                         }
                     }
@@ -106,9 +87,28 @@
             "apiVersion": "2020-11-01",
             "name": "[variables('networkSecurityGroupName')]",
             "location": "[parameters('location')]",
-            "tags": {},
+            "tags": "[variables('tags')]",
             "properties": {
                 "securityRules": [
+                    {
+                        "name": "AllowRDPInbound",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefixes": [
+                                "72.208.101.143",
+                                "4.1.98.242",
+                                "63.156.58.0/24",
+                                "172.23.10.0/24"
+                                ],
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
                     {
                         "name": "AllowSSHInBound",
                         "properties": {
@@ -119,10 +119,220 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowAzFoodsInBound",
+                        "properties": {
+                            "description": "AllowAzFoodsInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "172.16.252.0/22",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
                             "priority": 1000,
                             "direction": "Inbound",
                             "sourcePortRanges": [],
                             "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowDCsInBound",
+                        "properties": {
+                            "description": "AllowDCsInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [
+                                "172.17.2.44/32",
+                                "172.17.1.159/32"
+                            ],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "GlobalProtect",
+                        "properties": {
+                            "description": "GlobalProtect",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1200,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [
+                                "10.10.20.0/22",
+                                "10.10.24.0/24",
+                                "10.10.200.0/21"
+                            ],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyFirewallUntrustInBound",
+                        "properties": {
+                            "description": "DenyFirewallUntrustInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "10.117.2.0/24",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 1300,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyFirewallMgmtInBound",
+                        "properties": {
+                            "description": "DenyFirewallMgmtInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "10.117.4.0/24",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 1400,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowAzFoodsOutBound",
+                        "properties": {
+                            "description": "AllowAzFoodsOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "172.16.252.0/22",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowDCsOutBound",
+                        "properties": {
+                            "description": "AllowDCsOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1100,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": [
+                                "172.17.2.44/32",
+                                "172.17.1.159/32"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "GlobalProtectOutBound",
+                        "properties": {
+                            "description": "GlobalProtectOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1200,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": [
+                                "10.10.20.0/22",
+                                "10.10.24.0/24",
+                                "10.10.200.0/21"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "DenyFirewallUntrustOutBound",
+                        "properties": {
+                            "description": "DenyFirewallUntrustOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "10.117.2.0/24",
+                            "access": "Deny",
+                            "priority": 1300,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyFirewallMgmtOutBound",
+                        "properties": {
+                            "description": "DenyFirewallMgmtOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "10.117.4.0/24",
+                            "access": "Deny",
+                            "priority": 1400,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowInternalWebOutBound",
+                        "properties": {
+                            "description": "AllowInternalWebOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1500,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "443",
+                                "80"
+                            ],
                             "sourceAddressPrefixes": [],
                             "destinationAddressPrefixes": []
                         }
@@ -132,12 +342,10 @@
         },
             //  storage account
         {
-            "name": "templatestorage2201",
+            "name": "[parameters('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
-            "tags": {
-                "displayName": "templatestorage2201"
-            },
+            "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
             "sku": {
@@ -155,15 +363,16 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/','templatestorage2201')]"
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
             ],
-            "tags": {},
+            "tags": "[variables('tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('virtualMachineSize')]"
                 },
                 "storageProfile": {
                     "osDisk": {
+                        "name": "[variables('osDiskName')]",
                         "createOption": "fromImage",
                         "managedDisk": {
                             "storageAccountType": "[parameters('osDiskType')]"
@@ -196,7 +405,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "https://templatestorage2201.blob.core.windows.net/"
+                        "storageUri": "[concat('https://',parameters('storageAccountName'),'.blob.core.windows.net/')]"
                     }
                 }
             }
