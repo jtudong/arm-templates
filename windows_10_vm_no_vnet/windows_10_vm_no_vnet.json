@@ -73,6 +73,25 @@
                         }
                     },
                     {
+                        "name": "AllowSSHInbound",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefixes": [
+                                "72.208.101.143",
+                                "4.1.98.242",
+                                "63.156.58.0/24",
+                                "172.23.10.0/24"
+                                ],
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
                         "name": "AllowAzFoodsInBound",
                         "properties": {
                             "description": "AllowAzFoodsInBound",
@@ -347,10 +366,10 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "/subscriptions/67b03f65-308b-456f-b4a9-572c14a374cc/resourceGroups/sfc-network-dev-rg/providers/Microsoft.Network/virtualNetworks/sfc01-wu3-dev-vnet/subnets/dev-firewalltest"
-                            }/* ,
+                            },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('namePublicIPAddress'))]"
-                            } */
+                            }
                         }
                     }
                 ]
@@ -362,7 +381,7 @@
             "name": "[variables('namePublicIPAddress')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
-            "condition": false,
+            "condition": true,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {

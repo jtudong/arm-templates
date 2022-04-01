@@ -4,4 +4,7 @@ az group delete -n sfc-firewalltest-dev-rg --yes
 az group delete -n sfc-firewalltest-dev-rg --yes && az group create -n sfc-firewalltest-dev-rg -l westus3
 
 az deployment group validate -g sfc-firewalltest-dev-rg -f windows_10_vm_no_vnet.json -p  windows_10_vm_no_vnet.parameter.json
-az deployment group create -c -g sfc-firewalltest-dev-rg -f windows_10_vm_no_vnet.json -p  windows_10_vm_no_vnet.parameter.json
+az deployment group create -c -g sfc-firewalltest-dev-rg -f windows_10_vm_no_vnet.json -p  windows_10_vm_no_vnet.parameter.json -n "add_pip"
+
+az deployment group validate -g sfc-firewalltest-dev-rg -f routetable.json
+az deployment group create -c -g sfc-firewalltest-dev-rg -f routetable.json
