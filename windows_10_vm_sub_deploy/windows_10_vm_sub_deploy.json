@@ -1,11 +1,39 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "westus3"
+        },
+        "resourceGroupName": {
+            "type": "string",
+            "defaultValue": "resourceGroup",
+            "metadata": {
+                "description": "The name of the resource group"
+            }
+        }
+    },
     "functions": [],
-    "variables": {},
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "sandbox",
+            "Application": "network"
+        }
+    },
     "resources": [
-        
+        {
+            // Create the Resource Group
+            //
+            "name": "[parameters('resourceGroupName')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2022-01-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "tags": "[variables('tags')]"
+        }
     ],
     "outputs": {}
 }

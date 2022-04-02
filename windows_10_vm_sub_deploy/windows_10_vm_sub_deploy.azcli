@@ -1,8 +1,5 @@
 az account set -s 'network sandbox'
 cd /mnt/c/Users/jtudong/code/arm-templates/windows_10_vm_sub_deploy
 
-az group delete -n sandbox-windows-vm-rg --yes
-az group delete -n sandbox-windows-vm-rg --yes && az group create -n sandbox-windows-vm-rg -l westus3
-
-az deployment group validate -g sandbox-windows-vm-rg -f windows_10_vm.json -p windows_10_vm.parameters.json
-az deployment group create -c -g sandbox-windows-vm-rg -f windows_10_vm.json -p windows_10_vm.parameters.json
+az deployment sub validate -l westus3  -f windows_10_vm_sub_deploy.json -p windows_10_vm_sub_deploy.parameters.json
+az deployment sub create -c -l westus3 -f windows_10_vm_sub_deploy.json -p windows_10_vm_sub_deploy.parameters.json
