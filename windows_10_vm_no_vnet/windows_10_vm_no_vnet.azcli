@@ -1,4 +1,5 @@
 az account set -s 'SFC Dev/Test'
+cd /mnt/c/Users/jtudong/code/arm-templates/windows_10_vm_no_vnet
 
 az group delete -n sfc-firewalltest-dev-rg --yes
 az group delete -n sfc-firewalltest-dev-rg --yes && az group create -n sfc-firewalltest-dev-rg -l westus3
