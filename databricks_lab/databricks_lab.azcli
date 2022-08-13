@@ -1,6 +1,9 @@
 # set sub to Dev/Test
 az account set -s 'SFC Dev/Test'
 
+# set sub to Network Sandbox
+az account set -s 'Network Sandbox'
+
 # variables
 export $PASSWORD=
 
@@ -9,7 +12,7 @@ az group create -l westus2 -n sfc-dbtest-sandbox-rg
 
 # create sfc-dbtest-sandbox-rg resources
 az deployment group validate -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p sandbox-dbtest.parameters.json
-az deployment group create -c -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p sandbox-dbtest.parameters.json
+az deployment group create -c -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p sandbox-dbtest.parameters.json noVNG=1
 
 # set sub to Network Sandbox
 az account set -s 'Network Sandbox'

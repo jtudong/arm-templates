@@ -3,10 +3,15 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "westus2"
         },
         "subnetName": {
             "type": "string"
+        },
+        "noVNG": {
+            "type": "bool",
+            "defaultValue": false
         }
     },
     "functions": [],
@@ -70,6 +75,7 @@
             "name": "[variables('vngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "2020-11-01",
+            "condition": "[parameters('noVNG')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
