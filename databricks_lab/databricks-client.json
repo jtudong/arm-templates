@@ -16,7 +16,9 @@
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "vnetName": "[concat(parameters('subnetName'),'-vnet')]"
+        "vnetName": "[concat(parameters('subnetName'),'-vnet')]",
+        "pipName": "[concat(parameters('subnetName'),'-pip')]",
+        "vngName": "[concat(parameters('subnetName'),'-vng')]"
 },
     "resources": [
         {
@@ -45,6 +47,59 @@
                         }
                     }
                 ]
+            }
+        },
+        // create the PIP for the VNG
+        {
+            "name": "[variables('pipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "publicIPAddressVersion": "IPv4"
+            },
+            "sku": { "name": "Standard" },
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        // create the VNG
+        {
+            "name": "[variables('vngName')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "vnetGatewayConfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "VpnGw1AZ",
+                    "tier": "VpnGw1AZ"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false,
+                "enablePrivateIpAddress": true
             }
         }
     ],
