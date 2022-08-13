@@ -6,11 +6,9 @@
             "type": "String",
             "defaultValue": "westus2"
         },
-        "subnetName1": {
-            "type": "string"
-        },
-        "subnetName2": {
-            "type": "string"
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "sandbox-dbtest"
         },
         "noVNG": {
             "type": "bool",
@@ -25,9 +23,9 @@
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "vnetName": "[concat('sfc-',parameters('subnetName2'),'-vnet')]",
-        "pipName": "[concat(parameters('subnetName2'),'-pip')]",
-        "vngName": "[concat(parameters('subnetName2'),'-vng')]"
+        "vnetName": "[concat('sfc-',parameters('subnetName'),'-vnet')]",
+        "pipName": "[concat(parameters('subnetName'),'-pip')]",
+        "vngName": "[concat(parameters('subnetName'),'-vng')]"
     },
     "resources": [
         // create the vnet
@@ -45,7 +43,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('subnetName2')]",
+                        "name": "[parameters('subnetName')]",
                         "properties": { "addressPrefix": "10.10.1.0/24" }
                     },
                     {

@@ -5,11 +5,9 @@
         "location": {
             "type": "String"
         },
-        "subnetName1": {
-            "type": "string"
-        },
-        "subnetName2": {
-            "type": "string"
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "databricks-client"
         },
         "noVNG": {
             "type": "bool",
@@ -24,9 +22,9 @@
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "vnetName": "[concat(parameters('subnetName1'),'-vnet')]",
-        "pipName": "[concat(parameters('subnetName1'),'-pip')]",
-        "vngName": "[concat(parameters('subnetName1'),'-vng')]"
+        "vnetName": "[concat(parameters('subnetName'),'-vnet')]",
+        "pipName": "[concat(parameters('subnetName'),'-pip')]",
+        "vngName": "[concat(parameters('subnetName'),'-vng')]"
     },
     "resources": [
         {
@@ -43,7 +41,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('subnetName1')]",
+                        "name": "[parameters('subnetName')]",
                         "properties": {
                             "addressPrefix": "192.168.1.0/24"
                         }

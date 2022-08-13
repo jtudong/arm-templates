@@ -4,12 +4,6 @@
     "parameters": {
         "location": {
             "value": "westus2"
-        },
-        "subnetName1": {
-            "value": "databricks-client"
-        },
-        "subnetName2":{
-            "value": "sandbox-dbtest"
         }
     }
 }
