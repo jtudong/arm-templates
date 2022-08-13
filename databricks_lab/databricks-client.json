@@ -98,7 +98,8 @@
                 },
                 "gatewayType": "Vpn",
                 "vpnType": "RouteBased",
-                "enableBgp": false
+                "enableBgp": false,
+                "enablePrivateIpAddress": true
             }
         }
     ],
