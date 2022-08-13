@@ -5,7 +5,10 @@
         "location": {
             "value": "westus2"
         },
-        "subnetName": {
+        "subnetName1": {
+            "value": "databricks-client"
+        },
+        "subnetName2":{
             "value": "sandbox-dbtest"
         }
     }

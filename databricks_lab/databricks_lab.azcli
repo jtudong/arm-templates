@@ -11,8 +11,8 @@ export $PASSWORD=
 az group create -l westus2 -n sfc-dbtest-sandbox-rg
 
 # create sfc-dbtest-sandbox-rg resources
-az deployment group validate -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p sandbox-dbtest.parameters.json
-az deployment group create -c -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p sandbox-dbtest.parameters.json noVNG=1
+az deployment group validate -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p constants.json
+az deployment group create -c -g sfc-dbtest-sandbox-rg -f sandbox-dbtest.json -p constants.json noVNG=1
 
 # set sub to Network Sandbox
 az account set -s 'Network Sandbox'
@@ -21,5 +21,5 @@ az account set -s 'Network Sandbox'
 az group create -l westus2 -n databricks-client-rg
 
 # create databricks-client-rg resources
-az deployment group validate -g databricks-client-rg -f databricks-client.json -p databricks-client.parameters.json
-az deployment group create -c -g databricks-client-rg -f databricks-client.json -p databricks-client.parameters.json
+az deployment group validate -g databricks-client-rg -f databricks-client.json -p constants.json
+az deployment group create -c -g databricks-client-rg -f databricks-client.json -p constants.json noVNG=1

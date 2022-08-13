@@ -5,21 +5,29 @@
         "location": {
             "type": "String"
         },
-        "subnetName": {
+        "subnetName1": {
             "type": "string"
+        },
+        "subnetName2": {
+            "type": "string"
+        },
+        "noVNG": {
+            "type": "bool",
+            "defaultValue": false
         }
     },
     "functions": [],
-    "variables": {"tags": {
+    "variables": {
+        "tags": {
             "Department": "it",
             "Team": "networking",
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "vnetName": "[concat(parameters('subnetName'),'-vnet')]",
-        "pipName": "[concat(parameters('subnetName'),'-pip')]",
-        "vngName": "[concat(parameters('subnetName'),'-vng')]"
-},
+        "vnetName": "[concat(parameters('subnetName1'),'-vnet')]",
+        "pipName": "[concat(parameters('subnetName1'),'-pip')]",
+        "vngName": "[concat(parameters('subnetName1'),'-vng')]"
+    },
     "resources": [
         {
             "name": "[variables('vnetName')]",
@@ -35,7 +43,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('subnetName')]",
+                        "name": "[parameters('subnetName1')]",
                         "properties": {
                             "addressPrefix": "192.168.1.0/24"
                         }
@@ -72,6 +80,7 @@
             "name": "[variables('vngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "2020-11-01",
+            "condition":"[parameters('noVNG')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
