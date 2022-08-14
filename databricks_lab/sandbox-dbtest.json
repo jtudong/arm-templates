@@ -3,10 +3,46 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "westus2"
         },
         "subnetName": {
+            "type": "string",
+            "defaultValue": "sandbox-dbtest"
+        },
+        "createVNG": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "aw2ldbclient"
+        },
+        "storageAccountPrefix": {
             "type": "string"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue":"Standard_B2s",
+            "allowedValues": [
+                "Standard_B1s",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_DS1_v2",
+                "Standard_DS2_v3"
+            ]
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "adminUserName": {
+            "type": "string",
+            "defaultValue": "linuxadmin"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": ""
         }
     },
     "functions": [],
@@ -19,7 +55,11 @@
         },
         "vnetName": "[concat('sfc-',parameters('subnetName'),'-vnet')]",
         "pipName": "[concat(parameters('subnetName'),'-pip')]",
-        "vngName": "[concat(parameters('subnetName'),'-vng')]"
+        "vngName": "[concat(parameters('subnetName'),'-vng')]",
+        "networkInterfaceName": "[concat(parameters('subnetName'),'-nic')]",
+        "vmPipName": "[concat(parameters('subnetName'),'-1-pip')]",
+        "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"
     },
     "resources": [
         // create the vnet
@@ -65,12 +105,27 @@
                 "3"
             ]
         },
+        // create the PIP for the VM
+        {
+            "name": "[variables('vmPipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": { "name": "Basic" },
+            "zones": ["1"]
+        },
         // create the VNG
         {
             "name": "[variables('vngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "2020-11-01",
+            "condition": "[parameters('createVNG')]",
             "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
@@ -98,6 +153,137 @@
                 "vpnType": "RouteBased",
                 "enableBgp": false,
                 "enablePrivateIpAddress": true
+            }
+        },
+        //    network interface
+        {
+            "condition": true,
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmPipName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnetName'),parameters('subnetName'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vmPipName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            //      network security group
+            "condition": true,
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowSSHInBound",
+                        "properties": {
+                            "description": "AllowSSHInBound",
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [
+                                "72.208.101.143",
+                                "63.156.58.20"
+                            ],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        // create the storage account
+        {
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            }
+        },
+        {
+            //  virtual machine
+            "condition": true,
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "location": "[parameters('location')]",
+            "zones": ["1"],
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Oracle",
+                        "offer": "Oracle-Linux",
+                        "sku": "ol86-lvm-gen2",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUserName')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "patchSettings": {
+                            "patchMode": "ImageDefault"
+                        }
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
+                    }
+                }
             }
         }
     ],
