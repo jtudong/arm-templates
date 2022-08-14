@@ -11,7 +11,7 @@
         },
         "noVNG": {
             "type": "bool",
-            "defaultValue": false
+            "defaultValue": true
         },
         "virtualMachineName": {
             "type": "string",
@@ -134,6 +134,7 @@
             "apiVersion": "2020-11-01",
             "condition": "[parameters('noVNG')]",
             "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
