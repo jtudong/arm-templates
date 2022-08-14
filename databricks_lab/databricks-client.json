@@ -16,6 +16,9 @@
         "virtualMachineName": {
             "type": "string",
             "defaultValue": "aw2ldbclient"
+        },
+        "storageAccountPrefix": {
+            "type": "string"
         }
     },
     "functions": [],
@@ -31,7 +34,8 @@
         "vngName": "[concat(parameters('subnetName'),'-vng')]",
         "networkInterfaceName": "[concat(parameters('subnetName'),'-nic')]",
         "vmPipName": "[concat(parameters('subnetName'),'-1-pip')]",
-        "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]"
+        "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"
     },
     "resources": [
         // create the vnet
@@ -196,6 +200,19 @@
                         }
                     }
                 ]
+            }
+        },
+        // create the storage account
+        {
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
             }
         }
     ],

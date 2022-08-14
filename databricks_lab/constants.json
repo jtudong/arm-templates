@@ -4,6 +4,9 @@
     "parameters": {
         "location": {
             "value": "westus2"
+        },
+        "storageAccountPrefix":{
+            "value": "client"
         }
     }
 }
