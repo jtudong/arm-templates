@@ -5,7 +5,7 @@ az account set -s 'SFC Dev/Test'
 az account set -s 'Network Sandbox'
 
 # variables
-export $PASSWORD=
+export PASSWORD=
 
 # create the resource group
 az group create -l westus2 -n sfc-dbtest-sandbox-rg
@@ -22,4 +22,4 @@ az group create -l westus2 -n databricks-client-rg
 
 # create databricks-client-rg resources
 az deployment group validate -g databricks-client-rg -f databricks-client.json -p constants.json
-az deployment group create -c -g databricks-client-rg -f databricks-client.json -p constants.json noVNG=1
+az deployment group create -c -g databricks-client-rg -f databricks-client.json -p constants.json noVNG=1 adminPassword=$PASSWORD

@@ -7,6 +7,15 @@
         },
         "storageAccountPrefix":{
             "value": "client"
+        },
+        "virtualMachineSize":{
+            "value": "Standard_B2s"
+        },
+        "osDiskType":{
+            "value": "Standard_LRS"
+        },
+        "adminUserName":{
+            "value": "sfcadmin"
         }
     }
 }

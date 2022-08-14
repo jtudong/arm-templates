@@ -19,6 +19,29 @@
         },
         "storageAccountPrefix": {
             "type": "string"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue":"Standard_B2s",
+            "allowedValues": [
+                "Standard_B1s",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_DS1_v2",
+                "Standard_DS2_v3"
+            ]
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "adminUserName": {
+            "type": "string",
+            "defaultValue": "linuxadmin"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": ""
         }
     },
     "functions": [],
@@ -101,7 +124,8 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
             },
-            "sku": { "name": "Basic" }
+            "sku": { "name": "Basic" },
+            "zones": ["1"]
         },
         // create the VNG
         {
@@ -214,7 +238,68 @@
                 "name": "Standard_LRS",
                 "tier": "Standard"
             }
+        },
+        {
+            //  virtual machine
+            "condition": true,
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "location": "[parameters('location')]",
+            "zones": ["1"],
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Oracle",
+                        "offer": "Oracle-Linux",
+                        "sku": "ol86-lvm-gen2",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUserName')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "patchSettings": {
+                            "patchMode": "ImageDefault"
+                        }
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
+                    }
+                }
+            }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "username": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('virtualMachineName'))).osProfile.adminUsername]"
+        }
+    }
 }

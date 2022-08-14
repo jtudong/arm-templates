@@ -183,8 +183,8 @@
             }
         },
         {
-                //  virtual machine
-                //
+            //  virtual machine
+            //
             "condition": true,
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
