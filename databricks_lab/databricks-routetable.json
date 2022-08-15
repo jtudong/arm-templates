@@ -1,0 +1,59 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "dev-databricks-routeTable",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "location": "westus2",
+            "tags": {
+                "Application": "knowbe4",
+                "Team": "infosec",
+                "Department": "it",
+                "Environment": "prod"
+            },
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "prod-vnet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.117.0.0/16",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.117.3.4"
+                        }
+                    },
+                    {
+                        "name": "dev-vnet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.116.0.0/16",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.117.3.4"
+                        }
+                    },
+                    {
+                        "name": "vpngw-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/8",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.117.3.4"
+                        }
+                    },
+                    {
+                        "name": "vpngw-forced-firewall2",
+                        "properties": {
+                            "addressPrefix": "172.16.0.0/12",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.117.3.4"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
