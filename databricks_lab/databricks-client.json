@@ -58,7 +58,8 @@
         "networkInterfaceName": "[concat(parameters('subnetName'),'-nic')]",
         "vmPipName": "[concat(parameters('subnetName'),'-1-pip')]",
         "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
-        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]",
+        "localNetworkGatewayName": "[concat(parameters('subnetName'),'-lng')]"
     },
     "resources": [
         // create the vnet
@@ -294,6 +295,24 @@
                         "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
                     }
                 }
+            }
+        },
+        {
+            // local network gateway
+            "type": "Microsoft.Network/localNetworkGateways",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('localNetworkGatewayName')]",
+            "location": "[parameters('location')]",
+            "condition": true,
+            "dependsOn": ["[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "localNetworkAddressSpace": {
+                    "addressPrefixes": [
+                        "10.10.1.0/24"
+                    ]
+                },
+                "gatewayIpAddress": "51.143.52.26"
             }
         }
     ],
