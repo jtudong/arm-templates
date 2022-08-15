@@ -9,9 +9,9 @@
             "type": "string",
             "defaultValue": "databricks-client"
         },
-        "noVNG": {
+        "createVNG": {
             "type": "bool",
-            "defaultValue": true
+            "defaultValue": false
         },
         "virtualMachineName": {
             "type": "string",
@@ -133,7 +133,7 @@
             "name": "[variables('vngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "2020-11-01",
-            "condition": "[parameters('noVNG')]",
+            "condition": "[parameters('createVNG')]",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [

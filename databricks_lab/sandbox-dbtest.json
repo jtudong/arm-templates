@@ -12,7 +12,7 @@
         },
         "createVNG": {
             "type": "bool",
-            "defaultValue": true
+            "defaultValue": false
         },
         "virtualMachineName": {
             "type": "string",
@@ -101,6 +101,7 @@
             "name": "[variables('pipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
+            "condition": false,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -302,7 +303,7 @@
             "apiVersion": "2019-02-01",
             "name": "[variables('localNetworkGatewayName')]",
             "location": "[parameters('location')]",
-            "condition": true,
+            "condition": false,
             "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]" ],
             "tags": "[variables('tags')]",
             "properties": {
@@ -320,7 +321,7 @@
             "apiVersion": "2020-11-01",
             "name": "databricks-client_to_sfc-sandbox-dbtest",
             "location": "[parameters('location')]",
-            "condition": true,
+            "condition": false,
             "dependsOn": [
                 "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
