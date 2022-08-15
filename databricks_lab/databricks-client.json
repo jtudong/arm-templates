@@ -9,9 +9,9 @@
             "type": "string",
             "defaultValue": "databricks-client"
         },
-        "noVNG": {
+        "createVNG": {
             "type": "bool",
-            "defaultValue": true
+            "defaultValue": false
         },
         "virtualMachineName": {
             "type": "string",
@@ -58,7 +58,8 @@
         "networkInterfaceName": "[concat(parameters('subnetName'),'-nic')]",
         "vmPipName": "[concat(parameters('subnetName'),'-1-pip')]",
         "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
-        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]",
+        "localNetworkGatewayName": "[concat(parameters('subnetName'),'-lng')]"
     },
     "resources": [
         // create the vnet
@@ -132,7 +133,7 @@
             "name": "[variables('vngName')]",
             "type": "Microsoft.Network/virtualNetworkGateways",
             "apiVersion": "2020-11-01",
-            "condition": "[parameters('noVNG')]",
+            "condition": "[parameters('createVNG')]",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
@@ -219,7 +220,8 @@
                             "destinationPortRanges": [],
                             "sourceAddressPrefixes": [
                                 "72.208.101.143",
-                                "63.156.58.20"
+                                "63.156.58.20",
+                                "4.1.98.242"
                             ],
                             "destinationAddressPrefixes": []
                         }
@@ -294,6 +296,56 @@
                         "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
                     }
                 }
+            }
+        },
+        {
+            // local network gateway
+            "type": "Microsoft.Network/localNetworkGateways",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('localNetworkGatewayName')]",
+            "location": "[parameters('location')]",
+            "condition": true,
+            "dependsOn": ["[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "localNetworkAddressSpace": {
+                    "addressPrefixes": [
+                        "10.10.1.0/24"
+                    ]
+                },
+                "gatewayIpAddress": "40.64.82.63"
+            }
+        },
+        {
+            // connection
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2020-11-01",
+            "name": "databricks-client_to_sfc-sandbox-dbtest",
+            "location": "[parameters('location')]",
+            "condition": true,
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "localNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]"
+                },
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
+                },
+                "connectionType": "IPsec",
+                "connectionProtocol": "IKEv2",
+                "routingWeight": 0,
+                "sharedKey": "summer2022",
+                "enableBgp": false,
+                "useLocalAzureIpAddress": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "trafficSelectorPolicies": [],
+                "dpdTimeoutSeconds": 45,
+                "connectionMode": "ResponderOnly"
             }
         }
     ],
