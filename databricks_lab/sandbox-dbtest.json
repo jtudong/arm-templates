@@ -43,6 +43,10 @@
         "adminPassword": {
             "type": "securestring",
             "defaultValue": ""
+        },
+        "dbtestGatewayIP": {
+            "type": "string",
+            "defaultValue": "40.64.86.218"
         }
     },
     "functions": [],
@@ -101,7 +105,7 @@
             "name": "[variables('pipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
-            "condition": false,
+            "condition": "[parameters('createVNG')]",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -303,7 +307,7 @@
             "apiVersion": "2019-02-01",
             "name": "[variables('localNetworkGatewayName')]",
             "location": "[parameters('location')]",
-            "condition": false,
+            "condition": "[parameters('createVNG')]",
             "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]" ],
             "tags": "[variables('tags')]",
             "properties": {
@@ -312,7 +316,7 @@
                         "192.168.0.0/24"
                     ]
                 },
-                "gatewayIpAddress": "40.64.86.218"
+                "gatewayIpAddress": "[parameters('dbtestGatewayIP')]"
             }
         },
         {
@@ -321,7 +325,7 @@
             "apiVersion": "2020-11-01",
             "name": "databricks-client_to_sfc-sandbox-dbtest",
             "location": "[parameters('location')]",
-            "condition": false,
+            "condition": "[parameters('createVNG')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
