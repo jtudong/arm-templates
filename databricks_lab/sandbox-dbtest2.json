@@ -16,7 +16,7 @@
         },
         "storageAccountPrefix": {
             "type": "string",
-            "defaultValue": "dbclient"
+            "defaultValue": "dbrick"
         },
         "virtualMachineSize": {
             "type": "string",
@@ -35,7 +35,7 @@
         },
         "adminUserName": {
             "type": "string",
-            "defaultValue": "linuxadmin"
+            "defaultValue": "sfcadmin"
         },
         "adminPassword": {
             "type": "securestring",
@@ -102,7 +102,7 @@
             "name": "[variables('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
-            "condition": false,
+            "condition": true,
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
@@ -113,7 +113,7 @@
         },
         {
             //  virtual machine
-            "condition": false,
+            "condition": true,
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
