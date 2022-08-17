@@ -43,6 +43,10 @@
         "adminPassword": {
             "type": "securestring",
             "defaultValue": ""
+        },
+        "dbtestGatewayIP": {
+            "type": "string",
+            "defaultValue": "40.64.86.218"
         }
     },
     "functions": [],
@@ -68,6 +72,7 @@
             "name": "[variables('vnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
@@ -101,7 +106,7 @@
             "name": "[variables('pipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
-            "condition": false,
+            "condition": "[parameters('createVNG')]",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -120,6 +125,7 @@
             "name": "[variables('vmPipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -233,6 +239,7 @@
             "name": "[variables('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
+            "condition": true,
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
@@ -243,10 +250,10 @@
         },
         {
             //  virtual machine
-            "condition": true,
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "zones": [ "1" ],
             "dependsOn": [
@@ -302,8 +309,8 @@
             "type": "Microsoft.Network/localNetworkGateways",
             "apiVersion": "2019-02-01",
             "name": "[variables('localNetworkGatewayName')]",
+            "condition": "[parameters('createVNG')]",
             "location": "[parameters('location')]",
-            "condition": false,
             "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]" ],
             "tags": "[variables('tags')]",
             "properties": {
@@ -312,7 +319,7 @@
                         "192.168.0.0/24"
                     ]
                 },
-                "gatewayIpAddress": "40.64.86.218"
+                "gatewayIpAddress": "[parameters('dbtestGatewayIP')]"
             }
         },
         {
@@ -321,7 +328,7 @@
             "apiVersion": "2020-11-01",
             "name": "databricks-client_to_sfc-sandbox-dbtest",
             "location": "[parameters('location')]",
-            "condition": false,
+            "condition": "[parameters('createVNG')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
@@ -348,5 +355,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "username": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('virtualMachineName'))).osProfile.adminUsername]"
+        }
+    }
 }
