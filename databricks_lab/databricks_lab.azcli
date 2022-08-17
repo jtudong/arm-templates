@@ -21,7 +21,7 @@ az group create -l westus2 -n databricks-client-rg
 
 # create databricks-client-rg resources
 az deployment group validate -g databricks-client-rg -f databricks-client.json -p constants.json
-az deployment group create -c -g databricks-client-rg -f databricks-client.json -p constants.json adminPassword=$PASSWORD #.
+az deployment group create -c -g databricks-client-rg -f databricks-client.json -p constants.json adminPassword=$PASSWORD #createVNG=true createStorageAccount=true
 
 # stop the VMs
 az vm deallocate -g sfc-dbtest-sandbox-rg -n aw2ldbclient
