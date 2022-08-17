@@ -9,10 +9,6 @@
             "type": "string",
             "defaultValue": "databricks-client"
         },
-        "createVNG": {
-            "type": "bool",
-            "defaultValue": false
-        },
         "virtualMachineName": {
             "type": "string",
             "defaultValue": "aw2ldbclient"
@@ -43,9 +39,13 @@
             "type": "securestring",
             "defaultValue": ""
         },
-        "dbtestGatewayIP": {
+        /* "dbtestGatewayIP": {
             "type": "string",
-            "defaultValue": "20.99.194.64"
+            "defaultValue": ""
+        }, */
+        "createVNG": {
+            "type": "bool",
+            "defaultValue": false
         }
     },
     "functions": [],
@@ -62,8 +62,8 @@
         "networkInterfaceName": "[concat(parameters('subnetName'),'-nic')]",
         "vmPipName": "[concat(parameters('subnetName'),'-1-pip')]",
         "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
-        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]",
-        "localNetworkGatewayName": "[concat(parameters('subnetName'),'-lng')]"
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"/* ,
+        "localNetworkGatewayName": "[concat(parameters('subnetName'),'-lng')]" */
     },
     "resources": [
         // create the vnet
@@ -307,7 +307,7 @@
                 }
             }
         },
-        {
+        /* {
             // local network gateway
             "type": "Microsoft.Network/localNetworkGateways",
             "apiVersion": "2019-02-01",
@@ -325,27 +325,26 @@
                 },
                 "gatewayIpAddress": "[parameters('dbtestGatewayIP')]"
             }
-        },
+        }, */
         {
             // connection
             "type": "Microsoft.Network/connections",
             "apiVersion": "2020-11-01",
-            "name": "databricks-client_to_sfc-sandbox-dbtest",
+            "name": "dbclient_to_dbtest",
             "location": "[parameters('location')]",
             "condition": "[parameters('createVNG')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
             ],
             "tags": "[variables('tags')]",
             "properties": {
-                "localNetworkGateway2": {
-                    "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]"
-                },
                 "virtualNetworkGateway1": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
                 },
-                "connectionType": "IPsec",
+                "virtualNetworkGateway2":{
+                    "id":"/subscriptions/17df786b-c9ea-4f50-9cb0-57b80e526f55/resourceGroups/sfc-dbtest-sandbox-rg/providers/Microsoft.Network/virtualNetworkGateways/sandbox-dbtest-vng"
+                },
+                "connectionType": "Vnet2Vnet",
                 "connectionProtocol": "IKEv2",
                 "routingWeight": 0,
                 "sharedKey": "summer2022",
@@ -355,7 +354,7 @@
                 "ipsecPolicies": [],
                 "trafficSelectorPolicies": [],
                 "dpdTimeoutSeconds": 45,
-                "connectionMode": "ResponderOnly"
+                "connectionMode": "Default"
             }
         }
     ],
