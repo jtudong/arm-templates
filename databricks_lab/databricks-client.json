@@ -22,7 +22,7 @@
         },
         "virtualMachineSize": {
             "type": "string",
-            "defaultValue":"Standard_B2s",
+            "defaultValue": "Standard_B2s",
             "allowedValues": [
                 "Standard_B1s",
                 "Standard_B2s",
@@ -42,6 +42,10 @@
         "adminPassword": {
             "type": "securestring",
             "defaultValue": ""
+        },
+        "dbtestGatewayIP": {
+            "type": "string",
+            "defaultValue": "20.99.194.64"
         }
     },
     "functions": [],
@@ -67,6 +71,7 @@
             "name": "[variables('vnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
@@ -102,6 +107,7 @@
             "name": "[variables('pipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -120,13 +126,14 @@
             "name": "[variables('vmPipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
             },
             "sku": { "name": "Basic" },
-            "zones": ["1"]
+            "zones": [ "1" ]
         },
         // create the VNG
         {
@@ -168,10 +175,11 @@
         //    network interface
         //
         {
-            "condition": true,
+
             "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
+            "condition": true,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
@@ -234,6 +242,7 @@
             "name": "[variables('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
+            "condition": true,
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
@@ -249,7 +258,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "location": "[parameters('location')]",
-            "zones": ["1"],
+            "zones": [ "1" ],
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
                 "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]"
@@ -304,8 +313,9 @@
             "apiVersion": "2019-02-01",
             "name": "[variables('localNetworkGatewayName')]",
             "location": "[parameters('location')]",
-            "condition": true,
-            "dependsOn": ["[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"],
+            //"condition": "[parameters('createVNG')]",
+            "condition": false,
+            "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]" ],
             "tags": "[variables('tags')]",
             "properties": {
                 "localNetworkAddressSpace": {
@@ -313,7 +323,7 @@
                         "10.10.1.0/24"
                     ]
                 },
-                "gatewayIpAddress": "40.64.82.63"
+                "gatewayIpAddress": "[parameters('dbtestGatewayIP')]"
             }
         },
         {
@@ -322,7 +332,7 @@
             "apiVersion": "2020-11-01",
             "name": "databricks-client_to_sfc-sandbox-dbtest",
             "location": "[parameters('location')]",
-            "condition": true,
+            "condition": "[parameters('createVNG')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
