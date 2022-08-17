@@ -10,10 +10,6 @@
             "type": "string",
             "defaultValue": "sandbox-dbtest"
         },
-        "createVNG": {
-            "type": "bool",
-            "defaultValue": false
-        },
         "virtualMachineName": {
             "type": "string",
             "defaultValue": "aw2ldbtest"
@@ -47,6 +43,14 @@
         "dbtestGatewayIP": {
             "type": "string",
             "defaultValue": "40.64.86.218"
+        },
+        "createVNG": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "createStorageAccount": {
+            "type": "bool",
+            "defaultValue": false
         }
     },
     "functions": [],
@@ -87,9 +91,9 @@
                 "subnets": [
                     {
                         "name": "[parameters('subnetName')]",
-                        "properties": { 
+                        "properties": {
                             "addressPrefix": "10.10.1.0/24",
-                            "networkSecurityGroup":{
+                            "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
                             }
                         }
@@ -239,7 +243,7 @@
             "name": "[variables('storageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-04-01",
-            "condition": true,
+            "condition": "[parameters('createStorageAccount')]",
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "kind": "StorageV2",
@@ -304,12 +308,13 @@
                 }
             }
         },
-        {
+        /* {
             // local network gateway
             "type": "Microsoft.Network/localNetworkGateways",
             "apiVersion": "2019-02-01",
             "name": "[variables('localNetworkGatewayName')]",
-            "condition": "[parameters('createVNG')]",
+            //"condition": "[parameters('createVNG')]",
+            "condition": false,
             "location": "[parameters('location')]",
             "dependsOn": [ "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]" ],
             "tags": "[variables('tags')]",
@@ -321,27 +326,26 @@
                 },
                 "gatewayIpAddress": "[parameters('dbtestGatewayIP')]"
             }
-        },
+        }, */
         {
             // connection
             "type": "Microsoft.Network/connections",
             "apiVersion": "2020-11-01",
-            "name": "databricks-client_to_sfc-sandbox-dbtest",
+            "name": "dbtest-to-dbclient",
             "location": "[parameters('location')]",
             "condition": "[parameters('createVNG')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
             ],
             "tags": "[variables('tags')]",
             "properties": {
-                "localNetworkGateway2": {
-                    "id": "[resourceId('Microsoft.Network/localNetworkGateways', variables('localNetworkGatewayName'))]"
-                },
                 "virtualNetworkGateway1": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vngName'))]"
                 },
-                "connectionType": "IPsec",
+                "virtualNetworkGateway2": {
+                    "id": "/subscriptions/17df786b-c9ea-4f50-9cb0-57b80e526f55/resourceGroups/databricks-client-rg/providers/Microsoft.Network/virtualNetworkGateways/databricks-client-vng"
+                },
+                "connectionType": "Vnet2Vnet",
                 "connectionProtocol": "IKEv2",
                 "routingWeight": 0,
                 "sharedKey": "summer2022",
@@ -351,7 +355,7 @@
                 "ipsecPolicies": [],
                 "trafficSelectorPolicies": [],
                 "dpdTimeoutSeconds": 45,
-                "connectionMode": "InitiatorOnly"
+                "connectionMode": "Default"
             }
         }
     ],
