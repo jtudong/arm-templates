@@ -6,11 +6,11 @@
             "type": "String",
             "defaultValue": ""
         },
-        "subnetName": {
+        "databricksSubnetName": {
             "type": "string",
             "defaultValue": ""
         },
-        "clientAddressPrefix": {
+        "databricksSandboxAddressPrefix": {
             "type": "string",
             "defaultValue": ""
         }
@@ -23,13 +23,13 @@
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "clientVnetName": "[concat(parameters('subnetName'),'-client-vnet')]",
-        "clientNetworkSecurityGroupName": "[concat(parameters('subnetName'),'-client-nsg')]"
+        "databricksSandboxVnetName": "[concat(parameters('databricksSubnetName'),'-client-vnet')]",
+        "clientNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-client-nsg')]"
     },
     "resources": [
         {
             // create databricks-client-vnet
-            "name": "[variables('clientVnetName')]",
+            "name": "[variables('databricksSandboxVnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -38,14 +38,14 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[parameters('clientAddressPrefix')]"
+                        "[parameters('databricksSandboxAddressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('subnetName')]",
+                        "name": "[parameters('databricksSubnetName')]",
                         "properties": {
-                            "addressPrefix": "10.10.1.0/24",
+                            "addressPrefix": "10.17.10.0/24",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('clientNetworkSecurityGroupName'))]"
                             }
@@ -53,7 +53,7 @@
                     },
                     {
                         "name": "GatewaySubnet",
-                        "properties": { "addressPrefix": "10.10.0.0/24" }
+                        "properties": { "addressPrefix": "10.17.10.0/24" }
                     }
                 ]
             }
