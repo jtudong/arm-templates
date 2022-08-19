@@ -46,7 +46,8 @@
         },
         "databricksSubnetName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'))]",
         "hubNetworkSecurityGroupName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'),'-nsg')]",
-        "pipName": "[concat(parameters('databricksHubSubnetName'),'-pip')]"
+        "gwPipName": "[concat(parameters('databricksHubSubnetName'),'-pip')]",
+        "hubVmPipName": "[concat(parameters('databricksHubSubnetName'),'-vm-pip')]"
     },
     "resources": [
         // create databricks-sandbox-vnet
@@ -83,7 +84,7 @@
         },
         // create the PIP for the VNG
         {
-            "name": "[variables('pipName')]",
+            "name": "[variables('gwPipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
             "condition": true,
@@ -93,12 +94,21 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "publicIPAddressVersion": "IPv4"
             },
-            "sku": { "name": "Basic" },
-            "zones": [
-                "1",
-                "2",
-                "3"
-            ]
+            "sku": { "name": "Basic" }
+        },
+        // create the PIP for the VM
+        {
+            "name": "[variables('hubVmPipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "condition": true,
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "publicIPAddressVersion": "IPv4"
+            },
+            "sku": { "name": "Basic" }
         }
     ],
     "outputs": {
