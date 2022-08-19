@@ -39,11 +39,11 @@
         "adminPassword": {
             "type": "securestring",
             "defaultValue": ""
-        },
+        }/* ,
         "dbtestGatewayIP": {
             "type": "string",
             "defaultValue": "40.64.86.218"
-        },
+        } */,
         "createVNG": {
             "type": "bool",
             "defaultValue": false
@@ -67,8 +67,8 @@
         "networkInterfaceName": "[concat(parameters('subnetName'),'-nic')]",
         "vmPipName": "[concat(parameters('subnetName'),'-1-pip')]",
         "networkSecurityGroupName": "[concat(parameters('subnetName'),'-nsg')]",
-        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]",
-        "localNetworkGatewayName": "[concat(parameters('subnetName'),'-lng')]"
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"/* ,
+        "localNetworkGatewayName": "[concat(parameters('subnetName'),'-lng')]" */
     },
     "resources": [
         // create the vnet
