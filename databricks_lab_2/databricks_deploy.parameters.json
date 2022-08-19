@@ -10,6 +10,15 @@
         },
         "databricksSandboxAddressPrefix": {
             "value": "10.16.0.0/16"
+        },
+        "environment": {
+            "value": "sandbox"
+        },
+        "databricksSubnetAddress": {
+            "value": "10.16.100.0/24"
+        },
+        "databricksGatewaySubnetAddress": {
+            "value": "10.16.255.0/24"
         }
     }
 }

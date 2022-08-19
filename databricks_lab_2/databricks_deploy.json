@@ -6,11 +6,28 @@
             "type": "String",
             "defaultValue": ""
         },
+        "environment": {
+            "type": "string",
+            "defaultValue": "",
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        },
         "databricksSubnetName": {
             "type": "string",
             "defaultValue": ""
         },
         "databricksSandboxAddressPrefix": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "databricksSubnetAddress": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "databricksGatewaySubnetAddress": {
             "type": "string",
             "defaultValue": ""
         }
@@ -23,12 +40,12 @@
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "databricksSandboxVnetName": "[concat(parameters('databricksSubnetName'),'-client-vnet')]",
-        "clientNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-client-nsg')]"
+        "databricksSandboxVnetName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-vnet')]",
+        "clientNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-nsg')]"
     },
     "resources": [
         {
-            // create databricks-client-vnet
+            "comments": "create brickstest-sandbox-vnet",
             "name": "[variables('databricksSandboxVnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
@@ -45,7 +62,7 @@
                     {
                         "name": "[parameters('databricksSubnetName')]",
                         "properties": {
-                            "addressPrefix": "10.17.10.0/24",
+                            "addressPrefix": "[parameters('databricksSubnetAddress')]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('clientNetworkSecurityGroupName'))]"
                             }
@@ -53,7 +70,7 @@
                     },
                     {
                         "name": "GatewaySubnet",
-                        "properties": { "addressPrefix": "10.17.10.0/24" }
+                        "properties": { "addressPrefix": "[parameters('databricksGatewaySubnetAddress')]" }
                     }
                 ]
             }
