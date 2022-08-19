@@ -41,6 +41,7 @@
             "Application": "databricks"
         },
         "databricksSandboxVnetName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-vnet')]",
+        "databricksSubnetName": "[concat(parameters('databricksSubnetName'),parameters('environment'))]",
         "clientNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-nsg')]"
     },
     "resources": [
@@ -62,15 +63,15 @@
                     {
                         "name": "[parameters('databricksSubnetName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('databricksSubnetAddress')]",
+                            "addressPrefix": "[parameters('databricksSubnetAddress')]"/* ,
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('clientNetworkSecurityGroupName'))]"
-                            }
+                            } */
                         }
                     },
                     {
                         "name": "GatewaySubnet",
-                        "properties": { "addressPrefix": "[parameters('databricksGatewaySubnetAddress')]" }
+                        "properties": { "addressPrefix": "[variables('databricksSubnetName')]" }
                     }
                 ]
             }
