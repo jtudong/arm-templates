@@ -5,8 +5,11 @@
         "location": {
             "value": "westus3"
         },
-        "databricksSubnetName": {
-            "value": "brickstest"
+        "databricksHubVnetName": {
+            "value": "databricks-sandbox-vnet"
+        },
+        "databricksHubSubnetName": {
+            "value": "brickshub"
         },
         "databricksSandboxAddressPrefix": {
             "value": "10.16.0.0/16"

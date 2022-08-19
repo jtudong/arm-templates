@@ -15,7 +15,11 @@
                 "sandbox"
             ]
         },
-        "databricksSubnetName": {
+        "databricksHubVnetName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "databricksHubSubnetName": {
             "type": "string",
             "defaultValue": ""
         },
@@ -40,14 +44,13 @@
             "Environment": "sandbox",
             "Application": "databricks"
         },
-        "databricksSandboxVnetName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-vnet')]",
-        "databricksSubnetName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'))]",
-        "hubNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-nsg')]"
+        "databricksSubnetName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'))]",
+        "hubNetworkSecurityGroupName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'),'-nsg')]"
     },
     "resources": [
         {
             "comments": "create brickstest-sandbox-vnet",
-            "name": "[variables('databricksSandboxVnetName')]",
+            "name": "[parameters('databricksHubVnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
