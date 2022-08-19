@@ -42,7 +42,7 @@
         },
         "databricksSandboxVnetName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-vnet')]",
         "databricksSubnetName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'))]",
-        "clientNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-nsg')]"
+        "hubNetworkSecurityGroupName": "[concat(parameters('databricksSubnetName'),'-',parameters('environment'),'-nsg')]"
     },
     "resources": [
         {
