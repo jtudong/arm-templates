@@ -34,6 +34,10 @@
         "databricksGatewaySubnetAddress": {
             "type": "string",
             "defaultValue": ""
+        },
+        "createVNG": {
+            "type": "bool",
+            "defaultValue": false
         }
     },
     "functions": [],
@@ -46,8 +50,9 @@
         },
         "databricksSubnetName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'))]",
         "hubNetworkSecurityGroupName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'),'-nsg')]",
-        "gwPipName": "[concat(parameters('databricksHubSubnetName'),'-pip')]",
-        "hubVmPipName": "[concat(parameters('databricksHubSubnetName'),'-vm-pip')]"
+        "hubGwPipName": "[concat(parameters('databricksHubSubnetName'),'-pip')]",
+        "hubVmPipName": "[concat(parameters('databricksHubSubnetName'),'-vm-pip')]",
+        "hubVngName": "[concat(parameters('databricksHubSubnetName'),'-vng')]"
     },
     "resources": [
         // create databricks-sandbox-vnet
@@ -69,7 +74,7 @@
                     {
                         "name": "[variables('databricksSubnetName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('databricksSubnetAddress')]"/* ,
+                            "addressPrefix": "[parameters('databricksSubnetAddress')]" /* ,
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('clientNetworkSecurityGroupName'))]"
                             } */
@@ -84,17 +89,22 @@
         },
         // create the PIP for the VNG
         {
-            "name": "[variables('gwPipName')]",
-            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('hubGwPipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",https://docs.microsoft.com/en-us/azure/azure-resource-manager/best-practices-resource-manager-state
             "apiVersion": "2020-11-01",
             "condition": true,
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
-                "publicIPAllocationMethod": "Dynamic",
+                "publicIPAllocationMethod": "Static",
                 "publicIPAddressVersion": "IPv4"
             },
-            "sku": { "name": "Basic" }
+            "sku": { "name": "Standard" },
+            "zones": [
+                "1",
+                "2",
+                "3"
+            ]
         },
         // create the PIP for the VM
         {
@@ -109,6 +119,43 @@
                 "publicIPAddressVersion": "IPv4"
             },
             "sku": { "name": "Basic" }
+        },
+        // create the hub VNG
+        {
+            "name": "[variables('hubVngName')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2020-11-01",
+            "condition": "[parameters('createVNG')]",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('hubGwPipName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('databricksHubVnetName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "vnetGatewayConfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('databricksHubVnetName'), 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('hubGwPipName'))]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "VpnGw1AZ",
+                    "tier": "VpnGw1AZ"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false,
+                "enablePrivateIpAddress": true
+            }
         }
     ],
     "outputs": {
