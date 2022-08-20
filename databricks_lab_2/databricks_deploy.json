@@ -45,7 +45,7 @@
         "tags": {
             "Department": "it",
             "Team": "networking",
-            "Environment": "sandbox",
+            "Environment": "[parameters('environment')]",
             "Application": "databricks"
         },
         "databricksSubnetName": "[concat(parameters('databricksHubSubnetName'),'-',parameters('environment'))]",
@@ -63,7 +63,9 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('hubNetworkSecurityGroupName'))]"
+            ],
             "tags": "[variables('tags')]",
             "properties": {
                 "addressSpace": {
@@ -75,10 +77,10 @@
                     {
                         "name": "[variables('databricksSubnetName')]",
                         "properties": {
-                            "addressPrefix": "[parameters('databricksSubnetAddress')]" /* ,
+                            "addressPrefix": "[parameters('databricksSubnetAddress')]" ,
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('clientNetworkSecurityGroupName'))]"
-                            } */
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('hubNetworkSecurityGroupName'))]"
+                            }
                         }
                     },
                     {
@@ -88,7 +90,7 @@
                 ]
             }
         },
-        // create the PIP for the VNG
+        // create the PIP for the hub VNG
         {
             "name": "[variables('hubGwPipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
@@ -107,7 +109,7 @@
                 "3"
             ]
         },
-        // create the PIP for the VM
+        // create the PIP for the hub VM
         {
             "name": "[variables('hubVmPipName')]",
             "type": "Microsoft.Network/publicIPAddresses",
@@ -158,7 +160,7 @@
                 "enablePrivateIpAddress": true
             }
         },
-        //    network interface
+        //  hub network interface
         {
             "condition": true,
             "name": "[variables('hubNetworkInterfaceName')]",
@@ -182,6 +184,40 @@
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('hubVmPipName'))]"
                             }
+                        }
+                    }
+                ]
+            }
+        },
+        // hub network security group
+        {
+            "condition": true,
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "name": "[variables('hubNetworkSecurityGroupName')]",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowSSHInBound",
+                        "properties": {
+                            "description": "AllowSSHInBound",
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [
+                                "72.208.101.143",
+                                "63.156.58.20",
+                                "4.1.98.242"
+                            ],
+                            "destinationAddressPrefixes": []
                         }
                     }
                 ]
