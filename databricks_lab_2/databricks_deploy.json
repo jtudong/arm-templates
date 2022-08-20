@@ -90,7 +90,7 @@
         // create the PIP for the VNG
         {
             "name": "[variables('hubGwPipName')]",
-            "type": "Microsoft.Network/publicIPAddresses",https://docs.microsoft.com/en-us/azure/azure-resource-manager/best-practices-resource-manager-state
+            "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
             "condition": true,
             "location": "[parameters('location')]",
@@ -159,6 +159,6 @@
         }
     ],
     "outputs": {
-
+ 
     }
 }
