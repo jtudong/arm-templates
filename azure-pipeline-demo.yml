@@ -9,13 +9,12 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-parameters:
-  - name: resourceGroups
-    type: object
-    default:
-    - demo1
-    - demo2
-
 steps:
-- ${{ each group in parameters.resourceGroups }}
-  - script: echo ${{ group }}
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'network_sandbox_jtudong'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az group create -l westus3 -n databricks-sandbox-rg
+    failOnStandardError: true
