@@ -18,11 +18,4 @@ parameters:
 
 steps:
 - ${{ each group in parameters.resourceGroups }}
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: 'network_sandbox_jtudong'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        az group create -l westus3 -n ${{ group }}-rg
-      failOnStandardError: true
+  - script: echo ${{ group }}
